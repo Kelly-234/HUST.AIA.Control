@@ -1,6 +1,6 @@
 #ifndef __MODEL_H
 #define __MODEL_H
-
+#include "delay.h"
 #include "def.h"
 typedef struct
 {
@@ -19,6 +19,7 @@ typedef struct
 extern int num_mask[9][9];
 extern int add_mask[9][9];
 extern int flag_mask[9][9];
+extern int num_mask_lists[6][9][9];
 extern int button1[2];
 extern int button2[2];
 extern int open_sum;
@@ -26,9 +27,8 @@ extern int fill_num;
 extern int gap_num;
 extern int flag_num;
 extern int error_num;
-extern int max_error_num;
-extern int game_over;
 extern int flag;
+extern int level;
 extern pos currentCursor;
 
 #define POS_X_MIN 0

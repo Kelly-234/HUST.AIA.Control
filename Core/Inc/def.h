@@ -4,6 +4,8 @@
 #include "stm32g4xx_hal.h"
 #include "spi_tftlcd.h"
 
+//extern TIM_HandleTypeDef htim7;
+
 #define LCD_RST_Pin GPIO_PIN_4
 #define LCD_RST_GPIO_Port GPIOA
 #define LCD_RS_Pin GPIO_PIN_6

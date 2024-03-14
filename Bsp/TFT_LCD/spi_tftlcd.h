@@ -3,7 +3,7 @@
 #ifndef _LCD_DRIVER_H_
 #define _LCD_DRIVER_H_
 #include "init.h"
-
+#include "delay.h"
 /////////////////////////////////////用户配置区///////////////////////////////////
 // 支持横竖屏快速定义切换
 #define USE_HORIZONTAL 1

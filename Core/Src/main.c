@@ -1,67 +1,87 @@
 #include "main.h"
+void SystemClock_Config(void); 
+static void MX_TIM7_Init(void);
+void MX_GPIO_Init(void);
+TIM_HandleTypeDef htim7;
+
+int press_flag = 0;//
+int press_status = 0;
 
 void (*current_operation_index)();
 
 int main(void)
 {
-	HAL_Init();			  // ≥ı ºªØHALø‚
-	SystemClock_Config(); // …Ë÷√ ±÷”
+	HAL_Init();			  // 
+	SystemClock_Config(); // 
 	MX_GPIO_Init();
 	MX_SPI1_Init();
+	delay_init(150);
+
 	Lcd_Init();
+	MX_TIM7_Init();
+	__HAL_TIM_CLEAR_IT(&htim7,TIM_IT_UPDATE);
+	HAL_TIM_Base_Start_IT(&htim7);
+
 	uint8_t func_index = 0;
 	uint8_t last_index = 2;
+	//int test_flag = 0;
 	key_table table[30] =
 		{
 			{0, 0, 0, 1, 0, (*fun_0)}, /*0*/
-			// µ⁄1≤„
+			// ÔøΩÔøΩ1ÔøΩÔøΩ
 			{1, 1, 2, 3, 0, (*fun_a1)}, /*1*/
 			{2, 1, 2, 4, 0, (*fun_b1)}, /*2*/
-			// µ⁄2≤„
-			{3, 3, 3, 3, 1, (*fun_mine)}, /*3*/
-			{4, 4, 4, 4, 2, (*fun_set)}}; /*4*/
+			// ÔøΩÔøΩ2ÔøΩÔøΩ
+			{3, 3, 3, 3, 1, (*fun_control)}, /*3*/
+			{4, 4, 4, 4, 2, (*fun_set)}};	 /*4*/
 	Lcd_Clear(WHITE);
+
 	while (1)
 	{
+		//test_flag +=1;
 		if ((KEYS_PUSHING0 == KEYON) || (KEYS_PUSHING1 == KEYON) || (KEYS_PUSHING2 == KEYON) || (KEYS_PUSHING3 == KEYON))
 		{
-			HAL_Delay(5); // œ˚∂∂
-			if (KEYS_PUSHING0)
-			{
-				func_index = table[func_index].up; // œÚ…œ∑≠
-				while (KEYS_PUSHING0)
+			//HAL_Delay(5); // ÔøΩÔøΩÔøΩÔøΩ
+			//if(press_flag == 1)
+			//{
+				delay_ms(20);
+				if (KEYS_PUSHING0)
 				{
+					func_index = table[func_index].up; // ÔøΩÔøΩÔøΩœ∑ÔøΩ
+					while (KEYS_PUSHING0)
+					{
+					}
 				}
-			}
-			if (KEYS_PUSHING1)
-			{
-				func_index = table[func_index].down; // œÚœ¬∑≠
-				while (KEYS_PUSHING1)
+				if (KEYS_PUSHING1)
 				{
+					func_index = table[func_index].down; // ÔøΩÔøΩÔøΩ¬∑ÔøΩ
+					while (KEYS_PUSHING1)
+					{
+					}
 				}
-			}
-			if (KEYS_PUSHING2)
-			{
-				func_index = table[func_index].enter; // »∑»œ
-				while (KEYS_PUSHING2)
+				if (KEYS_PUSHING2)
 				{
+					func_index = table[func_index].enter; // »∑ÔøΩÔøΩ
+					while (KEYS_PUSHING2)
+					{
+					}
 				}
-			}
-			if (KEYS_PUSHING3)
-			{
-				func_index = table[func_index].back; // ∑µªÿ
-				while (KEYS_PUSHING3)
+				if (KEYS_PUSHING3)
 				{
+					func_index = table[func_index].back; // ÔøΩÔøΩÔøΩÔøΩ
+					while (KEYS_PUSHING3)
+					{
+					}
 				}
-			}
+				//press_flag = 0;
+			//}
 		}
-
 		if (func_index != last_index)
 		{
 			current_operation_index = table[func_index].current_operation;
 
-			(*current_operation_index)(); // ÷¥––µ±«∞≤Ÿ◊˜∫Ø ˝
-			if (*current_operation_index == fun_mine)
+			(*current_operation_index)(); // ÷¥ÔøΩ–µÔøΩ«∞ÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩÔøΩ
+			if (*current_operation_index == fun_control)
 			{
 				func_index = 1;
 				current_operation_index = table[func_index].current_operation;
@@ -75,6 +95,7 @@ int main(void)
 			}
 			last_index = func_index;
 		}
+		
 	}
 }
 
@@ -126,6 +147,95 @@ void Error_Handler(void)
 	}
 	/* USER CODE END Error_Handler_Debug */
 }
+
+
+static void MX_TIM7_Init(void)
+{
+
+  /* USER CODE BEGIN TIM7_Init 0 */
+
+  /* USER CODE END TIM7_Init 0 */
+
+  TIM_MasterConfigTypeDef sMasterConfig = {0};
+
+  /* USER CODE BEGIN TIM7_Init 1 */
+
+  /* USER CODE END TIM7_Init 1 */
+  htim7.Instance = TIM7;//ÔøΩÔøΩ ±ÔøΩÔøΩÔøΩÔøΩ ±∆µÔøΩÔøΩ= ±ÔøΩÔøΩ‘¥∆µÔøΩÔøΩ/ [(PSC+1)(ARR+1)]=170M/[(71+1)(999+1)]=1000HzÔøΩÔøΩÔøΩÔøΩÔøΩ‘∂ÔøΩ ±ÔøΩÔøΩ ±ÔøΩÔøΩŒ™1ms.
+  htim7.Init.Prescaler = 849;//PSC
+  htim7.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim7.Init.Period = 199;//ARR
+  //htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_ENABLE;
+  htim7.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim7) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  sMasterConfig.MasterOutputTrigger = TIM_TRGO_RESET;
+  sMasterConfig.MasterSlaveMode = TIM_MASTERSLAVEMODE_DISABLE;
+  if (HAL_TIMEx_MasterConfigSynchronization(&htim7, &sMasterConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM7_Init 2 */
+
+  /* USER CODE END TIM7_Init 2 */
+
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+ // if (htim->Instance == TIM7) 
+  if (htim->Instance == htim7.Instance)
+
+  {
+	
+	if(press_status == 0)
+	{
+		if ((KEYS_PUSHING0 == KEYON) || (KEYS_PUSHING1 == KEYON) || (KEYS_PUSHING2 == KEYON) || (KEYS_PUSHING3 == KEYON))
+		{
+			press_status = 1;
+		}
+	}
+	else if(press_status == 1)
+	{
+		if ((KEYS_PUSHING0 == KEYON) || (KEYS_PUSHING1 == KEYON) || (KEYS_PUSHING2 == KEYON) || (KEYS_PUSHING3 == KEYON))
+		{
+			press_flag = 1;
+			press_status = 2;
+		}
+		else
+		{
+			press_status = 0;
+
+		}
+	}
+	else
+	{
+		if ((KEYS_PUSHING0 == KEYOFF) || (KEYS_PUSHING1 == KEYOFF) || (KEYS_PUSHING2 == KEYOFF) || (KEYS_PUSHING3 == KEYOFF))
+		{
+			press_status = 0;
+		}
+	}
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+   if(GPIO_Pin == GPIO_PIN_0)  // ÂÅáËÆæ‰ΩøÁî®PA0‰Ωú‰∏∫Ëß¶Âèë‰∏≠Êñ≠ÁöÑÂºïËÑö
+   {
+		Lcd_Clear(WHITE);
+       // do something when the external interrupt event occurs
+   }
+}
+
+
 
 #ifdef USE_FULL_ASSERT
 /**

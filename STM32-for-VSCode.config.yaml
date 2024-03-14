@@ -23,10 +23,20 @@ ldscript: STM32G474RETx_FLASH.ld # linker script
 cDefinitions:
   - USE_HAL_DRIVER
   - STM32G474xx
+  - HAL_TIM_MODULE_ENABLED
+  - HAL_SPI_MODULE_ENABLED
+  - USE_HORIZONTAL_ENABLED
+  - USE_FULL_LL_DRIVER
+  - EXTI
 
 cxxDefinitions:
   - USE_HAL_DRIVER
   - STM32G474xx
+  - HAL_TIM_MODULE_ENABLED
+  - HAL_SPI_MODULE_ENABLED
+  - USE_HORIZONTAL_ENABLED
+  - USE_FULL_LL_DRIVER
+  - EXTI
 
 asDefinitions: []
 
@@ -78,6 +88,11 @@ includeDirectories:
   - Core/Lib/**
   - Src/**
   - Bsp/**
+  - Core/Src/**
+  - Core/Lib/**
+  - Drivers/**
+  - Drivers/STM32G4xx_HAL_Driver/Inc/**
+  - Drivers/BSP/STM32G4xx_Nucleo/**
 
 # Files that should be included in the compilation.
 # If a CubeMX makefile is present it will automatically include the  c and cpp/cxx files from that makefile.

@@ -148,11 +148,14 @@ void Lcd_Reset(void)
 	//   HAL_Delay(50);
 
 	LCD_RST_SET;
-	HAL_Delay(10);
+	//HAL_Delay(10);
+	delay_ms(20);
 	LCD_RST_CLR;
-	HAL_Delay(100);
+	//HAL_Delay(100);
+	delay_ms(100);
 	LCD_RST_SET;
-	HAL_Delay(100);
+	//HAL_Delay(100);
+	delay_ms(100);
 }
 /****************************************************************************
  * Ãû    ³Æ£ºvoid Lcd_Init(void)
@@ -281,7 +284,8 @@ void Lcd_Init(void)
 	LCD_WR_DATA(0x05); // 0F
 
 	LCD_WR_REG(0x11); // Exit Sleep
-	HAL_Delay(120);
+	//HAL_Delay(120);
+	delay_ms(120);
 	LCD_WR_REG(0x29); // display on
 }
 

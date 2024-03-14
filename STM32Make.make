@@ -40,6 +40,7 @@ Bsp/TFT_LCD/Font.c \
 Bsp/TFT_LCD/GUI.c \
 Bsp/TFT_LCD/spi_tftlcd.c \
 Core/Src/control.c \
+Core/Src/delay.c \
 Core/Src/init.c \
 Core/Src/main.c \
 Core/Src/model.c \
@@ -82,7 +83,7 @@ PREFIX = arm-none-eabi-
 POSTFIX = "
 # The gcc compiler bin path can be either defined in make command via GCC_PATH variable (> make GCC_PATH=xxx)
 # either it can be added to the PATH environment variable.
-GCC_PATH="c:/Users/kelly/AppData/Roaming/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-none-eabi-gcc/12.2.1-1.2.1/.content/bin
+GCC_PATH="D:/Program Files (x86)/GNU Arm Embedded Toolchain/10 2021.10/bin
 ifdef GCC_PATH
 CXX = $(GCC_PATH)/$(PREFIX)g++$(POSTFIX)
 CC = $(GCC_PATH)/$(PREFIX)gcc$(POSTFIX)
@@ -120,14 +121,24 @@ AS_DEFS =
 
 # C defines
 C_DEFS =  \
+-DEXTI \
+-DHAL_SPI_MODULE_ENABLED \
+-DHAL_TIM_MODULE_ENABLED \
 -DSTM32G474xx \
--DUSE_HAL_DRIVER
+-DUSE_FULL_LL_DRIVER \
+-DUSE_HAL_DRIVER \
+-DUSE_HORIZONTAL_ENABLED
 
 
 # CXX defines
 CXX_DEFS =  \
+-DEXTI \
+-DHAL_SPI_MODULE_ENABLED \
+-DHAL_TIM_MODULE_ENABLED \
 -DSTM32G474xx \
--DUSE_HAL_DRIVER
+-DUSE_FULL_LL_DRIVER \
+-DUSE_HAL_DRIVER \
+-DUSE_HORIZONTAL_ENABLED
 
 
 # AS includes
@@ -237,13 +248,13 @@ $(BUILD_DIR):
 # flash
 #######################################
 flash: $(BUILD_DIR)/$(TARGET).elf
-	"C:/USERS/KELLY/APPDATA/ROAMING/CODE/USER/GLOBALSTORAGE/BMD.STM32-FOR-VSCODE/@XPACK-DEV-TOOLS/OPENOCD/0.12.0-1.1/.CONTENT/BIN/OPENOCD.EXE" -f ./openocd.cfg -c "program $(BUILD_DIR)/$(TARGET).elf verify reset exit"
+	"D:/XPACK-OPENOCD-0.11.0-5-WIN32-X64/XPACK-OPENOCD-0.11.0-5/BIN/OPENOCD.EXE" -f ./openocd.cfg -c "program $(BUILD_DIR)/$(TARGET).elf verify reset exit"
 
 #######################################
 # erase
 #######################################
 erase: $(BUILD_DIR)/$(TARGET).elf
-	"C:/USERS/KELLY/APPDATA/ROAMING/CODE/USER/GLOBALSTORAGE/BMD.STM32-FOR-VSCODE/@XPACK-DEV-TOOLS/OPENOCD/0.12.0-1.1/.CONTENT/BIN/OPENOCD.EXE" -f ./openocd.cfg -c "init; reset halt; stm32g4x mass_erase 0; exit"
+	"D:/XPACK-OPENOCD-0.11.0-5-WIN32-X64/XPACK-OPENOCD-0.11.0-5/BIN/OPENOCD.EXE" -f ./openocd.cfg -c "init; reset halt; stm32g4x mass_erase 0; exit"
 
 #######################################
 # clean up

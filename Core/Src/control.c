@@ -2,18 +2,23 @@
 
 int check(int x, int y)
 {
+    int level_flag = 0;
     int flag_error = 0;
-    for (int i = 0; i < 9; i++)
+    if (level < 4)
     {
-        if (num_mask[y][i] == add_mask[x][y])
+        level_flag = 1;
+    }
+    for (int i = 0; i < (9 - level_flag * 3); i++)
+    {
+        if ((num_mask[i][y] == add_mask[x][y]) || ((add_mask[i][y] == add_mask[x][y]) && (i != x)))
         {
             flag_error = 1;
             break;
         }
     }
-    for (int i = 0; i < 9; i++)
+    for (int i = 0; i < (9 - level_flag * 3); i++)
     {
-        if (num_mask[i][x] == add_mask[x][y])
+        if ((num_mask[x][i] == add_mask[x][y]) || ((add_mask[x][i] == add_mask[x][y]) && (i != y)))
         {
             flag_error = 1;
             break;
@@ -21,176 +26,193 @@ int check(int x, int y)
     }
     for (int i = (x / 3 * 3); i < (x / 3 * 3 + 3); i++)
     {
-        for (int j = (y / 3 * 3); j < (y / 3 * 3 + 3); j++)
+        for (int j = (y / (3 - level_flag) * (3 - level_flag)); j < (y / (3 - level_flag) * (3 - level_flag) + (3 - level_flag)); j++)
         {
-            if (num_mask[j][i] == add_mask[x][y])
+            if ((num_mask[i][j] == add_mask[x][y]) || ((add_mask[i][j] == add_mask[x][y]) && (i != x) && (j != y)))
             {
                 flag_error = 1;
                 break;
             }
         }
+        if (flag_error)
+        {
+            break;
+        }
     }
-    if (flag_error && (!flag_mask[x][y]))
+    if (!flag_error) // ï¿½ï¿½Ð´ï¿½ï¿½È·
     {
-        flag_mask[x][y] = 1;
-        fill_num += 1;
+        if (flag_mask[x][y] == 2) // ï¿½Ï´ï¿½ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½
+        {
+            error_num -= 1;
+            flag_mask[x][y] = 1;
+            fill_num += 1;
+        }
+        else if (flag_mask[x][y] == 0) // ï¿½Ï´ï¿½Ã»ï¿½ï¿½
+        {
+            flag_mask[x][y] = 1;
+            fill_num += 1;
+        }
+        // ï¿½Ï´ï¿½ï¿½ï¿½È· ï¿½ï¿½ï¿½ï¿½
+        return 0;
+    }
+    else // ï¿½ï¿½Ð´ï¿½ï¿½ï¿½ï¿½
+    {
+        if (flag_mask[x][y] == 1) // ï¿½Ï´ï¿½ï¿½ï¿½Ð´ï¿½ï¿½È·
+        {
+            error_num += 1;
+            flag_mask[x][y] = 2;
+            fill_num -= 1;
+        }
+        else if (flag_mask[x][y] == 0) // ï¿½Ï´ï¿½Ã»ï¿½ï¿½
+        {
+            error_num += 1;
+            flag_mask[x][y] = 2;
+        }
+        // ï¿½Ï´Î´ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
         return 1;
+    }
+}
+
+void fun_control()
+{
+    int level_flag = 0;
+    uint8_t error_num_str[3] = {0};
+    uint8_t num_str[2] = {0};
+    button1[0] = 0;
+    button1[1] = 0;
+    button2[0] = 0;
+    if (level < 4)
+    {
+        level_flag = 1;
+        button2[1] = 8; // ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     }
     else
     {
-        flag_mask[x][y] = 1;
-        return 0;
+        button2[1] = 10; // ï¿½ï¿½ï¿½ï¿½Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     }
-}
-void fun_mine()
-{
-    uint8_t num_str[2] = {0};
-    uint8_t error_num_str[3] = {0};
+    currentCursor.x = 0;
+    currentCursor.y = 0;
+    flag = 0;
+    error_num = 0;
+    fill_num = 0;
+    for (int i = 0; i < 9; i++)
+        for (int j = 0; j < 9; j++)
+            add_mask[i][j] = 0;
 
     initView();
+    drawCursor(currentCursor.x, currentCursor.y, GRAY1);
+
     while (1)
     {
-        if (game_over)
-        {
-            if (KEYS_PUSHING0 && KEYS_PUSHING3)
-            {
-                break;
-            }
-            else
-                continue;
-        }
-
-        /* USER CODE END WHILE */
         if ((KEYS_PUSHING0) || (KEYS_PUSHING1) || (KEYS_PUSHING2) || (KEYS_PUSHING3))
         {
-            HAL_Delay(100); // Ïû¶¶
+            //HAL_Delay(150); // ï¿½ï¿½ï¿½ï¿½
+            delay_ms(150);
             if (KEYS_PUSHING0 && KEYS_PUSHING3)
-            {
                 break;
-            }
-            if (KEYS_PUSHING0 && KEYS_PUSHING1) // ÇøÓòÇÐ»»
+            else if (KEYS_PUSHING0 && KEYS_PUSHING1) // ï¿½ï¿½ï¿½ï¿½ï¿½Ð»ï¿½
             {
-                drawCursor(currentCursor.x, currentCursor.y, GRAY0);
                 if (flag)
                 {
+                    drawCursor(currentCursor.x, currentCursor.y, GRAY0);
                     button2[0] = currentCursor.x;
                     button2[1] = currentCursor.y;
                     currentCursor.x = button1[0];
                     currentCursor.y = button1[1];
+                    drawCursor(currentCursor.x, currentCursor.y, GRAY1);
                     if (add_mask[currentCursor.x][currentCursor.y])
                     {
-                        if (check(currentCursor.x, currentCursor.y))
+                        check(currentCursor.x, currentCursor.y);
+                        if (error_num > 9)
                         {
-                            error_num += 1;
-                            if (error_num > 9)
-                            {
-                                error_num_str[0] = '1';
-                                error_num_str[1] = '0' + error_num - 10;
-                                Gui_DrawFont_GBK16(110, 288, RED, WHITE, error_num_str);
-                            }
-                            else
-                            {
-                                error_num_str[0] = '0' + error_num;
-                                error_num_str[1] = '\0';
-                                Gui_DrawFont_GBK16(118, 288, RED, WHITE, error_num_str);
-                            }
-                            if (error_num > max_error_num)
-                            {
-                                failure();
-                            }
+                            error_num_str[0] = '1';
+                            error_num_str[1] = '0' + error_num - 10;
+                            Gui_DrawFont_GBK16(112, 288, RED, WHITE, error_num_str);
                         }
-                        if ((gap_num == fill_num) && error_num == 0) // ³É¹¦
+                        else
+                        {
+                            error_num_str[0] = '0' + error_num;
+                            error_num_str[1] = '\0';
+                            drawBar(110, 288, 150, 320, WHITE);
+                            Gui_DrawFont_GBK16(118, 288, RED, WHITE, error_num_str);
+                        }
+                        if (gap_num == fill_num) // ï¿½É¹ï¿½
                         {
                             success();
+                            level += 1;
+                            while (1)
+                            {
+                                if (KEYS_PUSHING2)
+                                {
+                                    //HAL_Delay(20); // ï¿½ï¿½ï¿½ï¿½
+                                    delay_ms(20);
+                                    if (KEYS_PUSHING2)
+                                    {
+                                        break;
+                                    }
+                                }
+                            }
+                            break;
+                        }
+                        if (fill_num / 10)
+                        {
+                            error_num_str[0] = '0' + fill_num / 10;
+                            error_num_str[1] = '0' + fill_num % 10;
+                            Gui_DrawFont_GBK16(10, 10, RED, WHITE, error_num_str);
+                        }
+                        else
+                        {
+                            error_num_str[0] = '0' + fill_num;
+                            error_num_str[1] = '\0';
+                            drawBar(10, 10, 60, 30, WHITE);
+                            Gui_DrawFont_GBK16(10, 10, RED, WHITE, error_num_str);
                         }
                     }
                     flag = 0;
                 }
                 else
                 {
-                    if (!num_mask[currentCursor.y][currentCursor.x])
+                    if (!num_mask[currentCursor.x][currentCursor.y])
                     {
+                        drawCursor(currentCursor.x, currentCursor.y, YELLOW);
                         button1[0] = currentCursor.x;
                         button1[1] = currentCursor.y;
                         currentCursor.x = button2[0];
                         currentCursor.y = button2[1];
+                        drawCursor(currentCursor.x, currentCursor.y, GRAY1);
                         flag = 1;
                     }
                 }
-                drawCursor(currentCursor.x, currentCursor.y, GRAY1);
             }
-            else if (KEYS_PUSHING1 && KEYS_PUSHING2 && flag) // Ñ¡ÔñÊý×Ö
+            else if (KEYS_PUSHING1 && KEYS_PUSHING2 && flag) // Ñ¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             {
                 add_mask[button1[0]][button1[1]] = currentCursor.x + 1;
                 num_str[0] = '0' + currentCursor.x + 1;
-                Gui_DrawFont_GBK16(30 + button1[0] * 20 + 7, 40 + button1[1] * 20 + 2, DGREEN, GRAY0, num_str);
+                Gui_DrawFont_GBK16(37 + level_flag * 30 + 20 * button1[0], 42 + level_flag * 30 + 20 * button1[1], DGREEN, YELLOW, num_str);
             }
-            // ÏÂÃæÊÇÉÏÏÂ×óÓÒ
-            else if (KEYS_PUSHING0 && (!flag))
+            else if (KEYS_PUSHING0 && (!flag) && (currentCursor.y)) // ï¿½ï¿½
             {
-                HAL_Delay(10);
-                if (KEYS_PUSHING0)
-                {
-                    HAL_Delay(500);
-                    if (KEYS_PUSHING0)
-                    {
-                        while (KEYS_PUSHING0)
-                        {
-                            if (currentCursor.y > POS_Y_MIN)
-                            {
-                                drawCursor(currentCursor.x, currentCursor.y, GRAY0);
-                                currentCursor.y -= 1;
-                                drawCursor(currentCursor.x, currentCursor.y, GRAY1);
-                            }
-                        }
-                        continue;
-                    }
-                    else
-                    {
-                        if (currentCursor.y > POS_Y_MIN)
-                        {
-                            drawCursor(currentCursor.x, currentCursor.y, GRAY0);
-                            currentCursor.y -= 1;
-                            drawCursor(currentCursor.x, currentCursor.y, GRAY1);
-                        }
-                    }
-                }
+                drawCursor(currentCursor.x, currentCursor.y, GRAY0);
+                currentCursor.y -= 1;
+                drawCursor(currentCursor.x, currentCursor.y, GRAY1);
             }
-            else if (KEYS_PUSHING3 && (!flag))
+            else if (KEYS_PUSHING1 && (!flag) && (currentCursor.y < (8 - level_flag * 3))) // ï¿½ï¿½
             {
-                if (currentCursor.y < POS_Y_MAX)
-                {
-                    drawCursor(currentCursor.x, currentCursor.y, GRAY0);
-                    currentCursor.y += 1;
-                    drawCursor(currentCursor.x, currentCursor.y, GRAY1);
-                }
-                while (KEYS_PUSHING3)
-                {
-                }
+                drawCursor(currentCursor.x, currentCursor.y, GRAY0);
+                currentCursor.y += 1;
+                drawCursor(currentCursor.x, currentCursor.y, GRAY1);
             }
-            else if (KEYS_PUSHING1)
+            else if (KEYS_PUSHING2 && currentCursor.x) // ï¿½ï¿½
             {
-                if (currentCursor.x > POS_X_MIN)
-                {
-                    drawCursor(currentCursor.x, currentCursor.y, GRAY0);
-                    currentCursor.x -= 1;
-                    drawCursor(currentCursor.x, currentCursor.y, GRAY1);
-                }
-                while (KEYS_PUSHING1)
-                {
-                }
+                drawCursor(currentCursor.x, currentCursor.y, GRAY0);
+                currentCursor.x -= 1;
+                drawCursor(currentCursor.x, currentCursor.y, GRAY1);
             }
-            else if (KEYS_PUSHING2)
+            else if (KEYS_PUSHING3 && (currentCursor.x < (8 - level_flag * 3))) // ï¿½ï¿½
             {
-                if (currentCursor.x < POS_X_MAX)
-                {
-                    drawCursor(currentCursor.x, currentCursor.y, GRAY0);
-                    currentCursor.x += 1;
-                    drawCursor(currentCursor.x, currentCursor.y, GRAY1);
-                }
-                while (KEYS_PUSHING2)
-                {
-                }
+                drawCursor(currentCursor.x, currentCursor.y, GRAY0);
+                currentCursor.x += 1;
+                drawCursor(currentCursor.x, currentCursor.y, GRAY1);
             }
         }
     }
@@ -199,76 +221,85 @@ void fun_mine()
 
 void fun_set()
 {
-    int min_num_0, min_num_1;
-    min_num_0 = fill_num % 10;
-    min_num_1 = (fill_num - min_num_0) / 10;
+    int color[4] = {DGREEN, DCYAN, GREEN, CYAN};
+    currentCursor.x = 0;
+    currentCursor.y = 0;
     draw_set();
+    draw_round_cursor(currentCursor.x, currentCursor.y, RED, MAROON);
     while (1)
     {
-        if (KEYS_PUSHING0 == KEYON)
+        if ((KEYS_PUSHING0) || (KEYS_PUSHING1) || (KEYS_PUSHING2) || (KEYS_PUSHING3))
         {
-            HAL_Delay(10);
-            if (KEYS_PUSHING0 == KEYON)
+            //HAL_Delay(100); // ï¿½ï¿½ï¿½ï¿½
+            delay_ms(100);
+            if (KEYS_PUSHING0 && KEYS_PUSHING1)
             {
-                HAL_Delay(500);
-                if (KEYS_PUSHING0 == KEYON)
-                {
-                    while (KEYS_PUSHING0 == KEYON)
-                    {
-                        fill_num = fill_num + 1;
-                        min_num_0 = fill_num % 10;
-                        min_num_1 = (fill_num - min_num_0) / 10;
-                        Gui_DrawFont_Num32(120, 70, RED, GRAY0, min_num_0);
-                        Gui_DrawFont_Num32(80, 70, RED, GRAY0, min_num_1);
-                        HAL_Delay(500);
-                    }
-                    continue;
-                }
-                else
-                    fill_num = fill_num + 1;
-                {
-                    min_num_0 = fill_num % 10;
-                    min_num_1 = (fill_num - min_num_0) / 10;
-                    Gui_DrawFont_Num32(120, 70, RED, GRAY0, min_num_0);
-                    Gui_DrawFont_Num32(80, 70, RED, GRAY0, min_num_1);
-                }
-            }
-        }
-        if (KEYS_PUSHING1 == KEYON)
-        {
-            HAL_Delay(10);
-            if (KEYS_PUSHING1 == KEYON)
-            {
-                HAL_Delay(500);
-                if (KEYS_PUSHING1 == KEYON)
-                {
-                    while (KEYS_PUSHING1 == KEYON)
-                    {
-                        fill_num = fill_num - 1;
-                        min_num_0 = fill_num % 10;
-                        min_num_1 = (fill_num - min_num_0) / 10;
-                        Gui_DrawFont_Num32(120, 70, RED, GRAY0, min_num_0);
-                        Gui_DrawFont_Num32(80, 70, RED, GRAY0, min_num_1);
-                        HAL_Delay(500);
-                    }
-                    continue;
-                }
-                else
-                    fill_num = fill_num - 1;
-                {
-                    min_num_0 = fill_num % 10;
-                    min_num_1 = (fill_num - min_num_0) / 10;
-                    Gui_DrawFont_Num32(120, 70, RED, GRAY0, min_num_0);
-                    Gui_DrawFont_Num32(80, 70, RED, GRAY0, min_num_1);
-                }
-            }
-        }
-        if (KEYS_PUSHING3 == KEYON)
-        {
-            HAL_Delay(10);
-            if (KEYS_PUSHING3 == KEYON)
-            {
+                level = currentCursor.y * 3 + currentCursor.x + 1;
                 break;
+            }
+            else if (KEYS_PUSHING0 && currentCursor.y)
+            {
+                //HAL_Delay(10);
+                delay_ms(20);
+                if (KEYS_PUSHING0)
+                {
+                    delay_ms(20);
+                    //HAL_Delay(20);
+                    draw_round_cursor(currentCursor.x, currentCursor.y, color[currentCursor.y + 2], color[currentCursor.y]);
+                    currentCursor.y = 0;
+                    draw_round_cursor(currentCursor.x, currentCursor.y, RED, MAROON);
+                }
+                while (KEYS_PUSHING0)
+                {
+                }
+            }
+            else if (KEYS_PUSHING1 && (!currentCursor.y))
+            {
+                delay_ms(20);
+                //HAL_Delay(10);
+                if (KEYS_PUSHING1)
+                {
+                    delay_ms(20);
+                    //HAL_Delay(20);
+                    draw_round_cursor(currentCursor.x, currentCursor.y, color[currentCursor.y + 2], color[currentCursor.y]);
+                    currentCursor.y = 1;
+                    draw_round_cursor(currentCursor.x, currentCursor.y, RED, MAROON);
+                }
+                while (KEYS_PUSHING1)
+                {
+                }
+            }
+            else if (KEYS_PUSHING2 && currentCursor.x)
+            {
+                delay_ms(20);
+                //HAL_Delay(10);
+                if (KEYS_PUSHING2)
+                {
+                    delay_ms(20);
+                    //HAL_Delay(20);
+                    draw_round_cursor(currentCursor.x, currentCursor.y, color[currentCursor.y + 2], color[currentCursor.y]);
+                    currentCursor.x -= 1;
+                    draw_round_cursor(currentCursor.x, currentCursor.y, RED, MAROON);
+                }
+                while (KEYS_PUSHING2)
+                {
+                }
+            }
+            else if (KEYS_PUSHING3 && (currentCursor.x < 2))
+            {
+                delay_ms(20);
+                //HAL_Delay(10);
+                if (KEYS_PUSHING3)
+                {
+                    delay_ms(20);
+                    //HAL_Delay(20);
+                    draw_round_cursor(currentCursor.x, currentCursor.y, color[currentCursor.y + 2], color[currentCursor.y]);
+                    currentCursor.x += 1;
+                    draw_round_cursor(currentCursor.x, currentCursor.y, RED, MAROON);
+                }
+                while (KEYS_PUSHING3)
+                {
+                }
             }
         }
     }

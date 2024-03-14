@@ -3,7 +3,7 @@
 
 #include "stdio.h"
 #include "stdlib.h"
-
+#include "delay.h"
 #include "def.h"
 #include "GUI.h"
 #include "control.h"
@@ -22,4 +22,6 @@ void fun_0();
 void fun_a1();
 void fun_b1();
 void draw_set();
+void draw_round_cursor(int x, int y, int bg, int text);
+void operating_instructions(void);
 #endif
